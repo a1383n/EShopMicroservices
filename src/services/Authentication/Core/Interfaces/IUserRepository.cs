@@ -6,13 +6,13 @@ namespace Core.Interfaces;
 
 public interface IUserRepository : IRepository<User>
 {
-    Task<User> GetByIdAsync(ObjectId id);
-    Task<User> GetByEmailAddressAsync(string emailAddress);
-    Task<User> GetByPhoneNumberAsync(string phone);
+    Task<User?> GetByIdAsync(ObjectId id);
+    Task<User?> GetByEmailAddressAsync(string emailAddress);
+    Task<User?> GetByPhoneNumberAsync(string phone);
     Task AppendProviderAsync(ObjectId id, ProviderInfo providerInfo);
     Task RemoveProviderAsync(ObjectId id, string providerId);
     Task SetProfileAsync(ObjectId id, UserProfile profile);
     Task SetDisabledAsync(ObjectId id, bool isDisabled = true);
-    Task SetLastSignInAtAsync(ObjectId id, DateTime lastSignIn);
-    Task SetLastRefreshAtAsync(ObjectId id, DateTime lastRefresh);
+    Task UpdateLastSignInAtAsync(ObjectId id);
+    Task UpdateLastRefreshAtAsync(ObjectId id);
 }

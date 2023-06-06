@@ -13,26 +13,26 @@ public class UserRepository : Repository<User>, IUserRepository
     {
     }
 
-    public Task<User> GetByEmailAddressAsync(string emailAddress)
+    public override FilterDefinition<User> GetByIdFilter(ObjectId id)
     {
-        throw new NotImplementedException();
+        return GetFilterDefinitionBuilder().Eq(user => user.Id, id);
     }
 
-    public async Task<User> GetByIdAsync(ObjectId id)
+    public async Task<User?> GetByEmailAddressAsync(string emailAddress)
     {
-        var filterDefinition = Builders<User>.Filter.Eq(e => e.Id, id);
-
-        return (await _collection.FindAsync(filterDefinition)).FirstOrDefault();
+        return (await _collection.FindAsync(GetFilterDefinitionBuilder().Eq(user => user.Email, emailAddress)))
+            .FirstOrDefault();
     }
 
-    public Task<User> GetByPhoneNumberAsync(string phone)
+    public async Task<User?> GetByIdAsync(ObjectId id)
     {
-        throw new NotImplementedException();
+        return (await _collection.FindAsync(GetByIdFilter(id))).FirstOrDefault();
     }
 
-    public Task CreateUser(User user)
+    public async Task<User?> GetByPhoneNumberAsync(string phone)
     {
-        throw new NotImplementedException();
+        return (await _collection.FindAsync(GetFilterDefinitionBuilder().Eq(user => user.Phone, phone)))
+            .FirstOrDefault();
     }
 
     public Task AppendProviderAsync(ObjectId id, ProviderInfo providerInfo)
@@ -55,12 +55,16 @@ public class UserRepository : Repository<User>, IUserRepository
         throw new NotImplementedException();
     }
 
-    public Task SetLastSignInAtAsync(ObjectId id, DateTime lastSignIn)
+    public Task UpdateLastSignInAtAsync(ObjectId id)
     {
-        throw new NotImplementedException();
+        return UpdateAsync(
+            GetByIdFilter(id),
+            GetUpdateDefinitionBuilder().Set(user => user.LastSignInAt,
+                new BsonTimestamp(DateTimeOffset.Now.ToUnixTimeSeconds()))
+        );
     }
 
-    public Task SetLastRefreshAtAsync(ObjectId id, DateTime lastRefresh)
+    public Task UpdateLastRefreshAtAsync(ObjectId id)
     {
         throw new NotImplementedException();
     }

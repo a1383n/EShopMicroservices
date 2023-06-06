@@ -10,6 +10,15 @@ public class User: IEntity
     [BsonId]
     public ObjectId Id { get; set; }
 
+    [BsonIgnoreIfNull]
+    public string? Email;
+
+    [BsonIgnoreIfNull]
+    public string? Phone;
+
+    [BsonIgnoreIfNull]
+    public string? Password;
+    
     public List<ProviderInfo> Providers { get; set; }
 
     [BsonIgnoreIfNull]
@@ -19,13 +28,13 @@ public class User: IEntity
     public bool IsDisabled = false;
 
     [BsonIgnoreIfNull]
-    public DateTime? LastSignInAt { get; set; }
+    public BsonTimestamp? LastSignInAt { get; set; }
 
     [BsonIgnoreIfNull]
-    public DateTime? LastRefreshAt { get; set; }
+    public BsonTimestamp? LastRefreshAt { get; set; }
 
     [BsonIgnoreIfNull] 
-    public DateTime? UpdatedAt { get; set; }
+    public BsonTimestamp? UpdatedAt { get; set; }
 
     public User(List<ProviderInfo> providers)
     {

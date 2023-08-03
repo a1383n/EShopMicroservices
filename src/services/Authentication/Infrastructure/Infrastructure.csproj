@@ -13,7 +13,15 @@
 
     <ItemGroup>
       <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.16" />
       <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Persistence\" />
+      <Folder Include="Providers\" />
+      <Folder Include="Repositories\" />
+      <Folder Include="Services\" />
     </ItemGroup>
 
 </Project>

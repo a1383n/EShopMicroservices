@@ -1,42 +1,55 @@
 using API.Model;
-using Core.Enums;
-using Core.Services;
+using AutoMapper;
+using Entities.Models;
+using Framework.Api;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
+using Services.Contracts;
+using Services.Enums;
+using Services.Models;
 
 namespace API.Controllers;
 
-[ApiController]
-[Route("[controller]/[action]")]
-public class AuthController : ControllerBase
+[ApiVersion("1.0")]
+public class AuthController : BaseController
 {
-    private readonly ILogger<AuthController> _logger;
     private readonly IAuthService _authService;
 
-    public AuthController(ILogger<AuthController> logger, IAuthService authService)
+    public AuthController(IMapper mapper, IAuthService authService) : base(mapper)
     {
-        _logger = logger;
         _authService = authService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Token(TokenRequest request)
+    public async Task<ApiResult> Token(TokenRequest request)
     {
         var validator = new CredentialValidator();
-        var result = validator.Validate(request.Credential);
-
-        if (result.IsValid)
+        var result = await validator.ValidateAsync(request.Credential);
+        
+        if (!result.IsValid)
         {
-            var user = await _authService.LoginWithPayload(
-                (ProviderId)request.Credential.ProviderId!,
-                (SignInMethod)request.Credential.SignInMethod!,
-                request.Credential.GetPayload());
+            return ApiResult<Token>.UnprocessableEntity(new ValidationError(result.Errors));
+        }
 
-            return Ok((object?)user.GetResult().ToJson() ?? user.GetError());
-        }
-        else
+        var user = await _authService.AuthenticateWithPayload(
+            (ProviderId)request.Credential.ProviderId!,
+            (SignInMethod)request.Credential.SignInMethod!,
+            request.Credential.GetPayload()
+        );
+
+        if (user.IsFailure)
+            return ApiResult<AuthError>.Failed(user.Error);
+
+        var token = await _authService.Login(user.Value, new Device
         {
-            return UnprocessableEntity(result.ToDictionary());
-        }
+            Type = request.DeviceDto.Type,
+            Os = request.DeviceDto.Os,
+            OsVersion = request.DeviceDto.OsVersion,
+            Name = request.DeviceDto.Name,
+            ClientVersion = request.DeviceDto.ClientVersion
+        });
+
+        return token.IsSuccess
+            ? ApiResult<Token>.Successful(token.Value)
+            : ApiResult<AuthError>.Failed(token.Error);
     }
 }

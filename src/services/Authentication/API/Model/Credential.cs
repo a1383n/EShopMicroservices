@@ -1,7 +1,8 @@
-using Core.Enums;
-using Core.Model.Provider;
-using Core.Providers;
+using Entities.Models.Providers.Base;
+using Entities.Models.Providers.Payload;
 using FluentValidation;
+using Services.Contracts.Providers;
+using Services.Enums;
 
 namespace API.Model;
 
@@ -17,7 +18,7 @@ public class Credential
     {
         return ProviderId! switch
         {
-            Core.Enums.ProviderId.Email => new EmailProviderPayload(Payload["email"]!,Payload["password"] ?? null),
+            Services.Enums.ProviderId.Email => new EmailProviderPayload(Payload["email"]!,Payload["password"] ?? null),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

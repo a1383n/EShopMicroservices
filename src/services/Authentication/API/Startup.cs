@@ -1,57 +1,73 @@
 using System.Text.Json.Serialization;
-using Core.Interfaces;
-using Core.Providers;
-using Core.Services;
-using Infrastructure.Persistence;
-using Infrastructure.Providers;
-using Infrastructure.Repositories;
-using Infrastructure.Services;
+using Autofac;
+using DataAccessLayer;
+using Entities.Models.Base;
+using Framework.Configuration;
+using Framework.Mapper;
+using Framework.Swagger;
+using Services.Contracts;
 
 namespace API;
 
 public class Startup
 {
-    private IConfiguration Configuration { get; }
+    private IConfiguration _configuration { get; }
+    private readonly IWebHostEnvironment _environment;
 
-    public Startup(IConfiguration configuration)
+
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        Configuration = configuration;
+        _configuration = configuration;
+        _environment = environment;
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.InitializeAutoMapper();
+        services.AddDbContext(_configuration);
+        
+        if (_environment.IsDevelopment())
+        {
+            services.AddSwagger();
+        }
+
         services.AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-            
+
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        services.AddCustomApiVersioning();
 
         services.AddRouting(options => options.LowercaseUrls = true);
-
-        string connectionString = Configuration.GetConnectionString("DefaultConnection");
-        
-        services.AddSingleton(new DbContext(connectionString,"auth"));
-        services.AddSingleton<IHasher, Hasher>();
-        services.AddSingleton<IUserRepository, UserRepository>();
-        services.AddSingleton<IEmailProvider, EmailProvider>();
-        services.AddSingleton<IAuthService, AuthService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void ConfigureContainer(ContainerBuilder builder)
     {
-        if (env.IsDevelopment())
+        var assemblies = new[]
         {
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            typeof(IEntity).Assembly,
+            typeof(IMongoDbContext).Assembly,
+            typeof(IAuthService).Assembly
+        };
+
+        builder.AddServices(assemblies);
+    }
+
+    public void Configure(IApplicationBuilder app)
+    {
+        //TODO: Add custom exception handler
+
+        if (_environment.IsProduction())
+        {
+            app.UseHttpsRedirection();
+            app.UseHsts();
         }
-        else
+        else if (_environment.IsDevelopment())
         {
-            // Configure error handling for other environments
-            // For example: app.UseExceptionHandler("/Home/Error");
+            app.UseSwagger();
+            app.UseSwaggerUI();   
         }
 
         app.UseRouting();

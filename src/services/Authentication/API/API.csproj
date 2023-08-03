@@ -8,19 +8,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
-      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+      <ProjectReference Include="..\Framework\Framework.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Model\Main\Dtos\" />
+      <Folder Include="Model\Main\Validators\" />
+      <Folder Include="Model\Providers\Phone\DTOs\Response\" />
+      <Folder Include="Model\Providers\Phone\Validators\Request\" />
+      <Folder Include="Model\Providers\Phone\Validators\Response\" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Framework\Framework.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Model\Main\Dtos\" />
+      <Folder Include="Model\Main\Validators\" />
+      <Folder Include="Model\Providers\Phone\Validators\Request\" />
+      <Folder Include="Model\Providers\Phone\Validators\Response\" />
+    </ItemGroup>
+
+
+</Project>

@@ -1,10 +1,15 @@
 using System.Text.Json.Serialization;
+using API.Model.Providers.Phone.DTOs.Request;
 using Autofac;
 using DataAccessLayer;
 using Entities.Models.Base;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Framework.Configuration;
 using Framework.Mapper;
 using Framework.Swagger;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Services.Contracts;
 
 namespace API;
@@ -32,10 +37,30 @@ public class Startup
         }
 
         services.AddControllers()
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var problemDetailsFactory =
+                        context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+                    var problemDetails =
+                        problemDetailsFactory.CreateValidationProblemDetails(context.HttpContext, context.ModelState,
+                            422);
+
+                    var result = new ObjectResult(problemDetails)
+                    {
+                        StatusCode = 422
+                    };
+                    return result;
+                };
+            })
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
+
+        services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+        services.AddFluentValidationAutoValidation();
 
         services.AddEndpointsApiExplorer();
         services.AddCustomApiVersioning();

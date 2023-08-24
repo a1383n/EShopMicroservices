@@ -1,20 +1,25 @@
 using API.Model.Providers.Phone.DTOs.Request;
 using AutoMapper;
+using Common;
+using Common.Model.Settings.Providers;
 using Framework.Api;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers.Providers;
 
-[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/auth/providers/phone/[action]")]
 public class PhoneProviderController : BaseController
 {
-    public PhoneProviderController(IMapper mapper) : base(mapper)
+    private readonly PhoneAuthProviderSetting _setting;
+
+    public PhoneProviderController(IMapper mapper, Settings setting) : base(mapper)
     {
+        _setting = setting.AuthProviderSettings.PhoneAuthProviderSetting;
     }
     
     [HttpPost]
-    public ApiResult Verification([FromBody] PhoneVerificationRequestDTO requestDto)
+    public ApiResult Verification([FromBody] PhoneVerificationRequestDto requestDto)
     {
-        return ApiResult<String>.Successful("10");
+        return ApiResult<object>.Successful(this._setting);
     }
 }

@@ -20,9 +20,9 @@
     <ItemGroup>
       <Folder Include="Model\Main\Dtos\" />
       <Folder Include="Model\Main\Validators\" />
-      <Folder Include="Model\Providers\Phone\DTOs\Response\" />
       <Folder Include="Model\Providers\Phone\Validators\Request\" />
       <Folder Include="Model\Providers\Phone\Validators\Response\" />
     </ItemGroup>
+
 
 </Project>

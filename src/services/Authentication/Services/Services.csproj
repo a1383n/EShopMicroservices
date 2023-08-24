@@ -13,6 +13,7 @@
     <ItemGroup>
       <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
       <PackageReference Include="CSharpFunctionalExtensions" Version="2.39.2" />
+      <PackageReference Include="libphonenumber-csharp" Version="8.13.18" />
     </ItemGroup>
 
 </Project>
